@@ -11,11 +11,11 @@ let joinConfig = {};
 if (argv.name) {
   joinConfig = { name: argv.name };
 }
-
+const baseDir = "./orbitdb/examples/";
 console.log("Starting...")
 
 const ipfs = new IPFS({
-  repo: `./orbitdb/ipfs/${joinConfig.name}`,
+  repo: baseDir+`/ipfs/${joinConfig.name}`,
   start: true,
   EXPERIMENTAL: {
     pubsub: true,
@@ -69,17 +69,27 @@ const disconnectPeer = (sneezeEvt) => {
 ipfs.on('error', (err) => console.error(err))
 ipfs.on('ready', async () => {
 
+  ipfs.id()
+    .then((err, identity) => {
+      if (err) {
+        throw err
+      }
+      console.log("self identity: ", identity)
+    })
+    .catch(error => console.error(error))
+
+
   sneeze.on('add', (evt) => {
-    // console.log('add', evt)
+    console.log('add:--\n', evt)
     connectPeer(evt)
   })
   sneeze.on('remove', (evt) => {
-    // console.log('remove', evt)
+    console.log('remove:--\n', evt)
     disconnectPeer(evt)
   })
 
   try {
-    const orbitdb = new OrbitDB(ipfs, `./orbitdb/example`)
+    const orbitdb = new OrbitDB(ipfs, baseDir+'/orbit-db')
 
   } catch (e) {
     console.error(e)
